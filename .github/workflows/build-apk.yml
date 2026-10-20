@@ -14,6 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Locate project folder
+        run: |
+          F=$(find . -name capacitor.config.ts -not -path '*/node_modules/*' | head -1)
+          if [ -z "$F" ]; then echo "capacitor.config.ts not found - files missing from upload"; find . -maxdepth 3 -not -path './.git/*' | head -50; exit 1; fi
+          echo "APP_DIR=$(dirname "$F")" >> $GITHUB_ENV
+          echo "Project is in: $(dirname "$F")"
+
       - uses: pnpm/action-setup@v4
         with:
           version: 10
@@ -21,7 +28,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
 
       - uses: actions/setup-java@v4
         with:
@@ -31,19 +37,21 @@ jobs:
       - uses: android-actions/setup-android@v3
 
       - name: Install dependencies
+        working-directory: ${{ env.APP_DIR }}
         run: pnpm install --no-frozen-lockfile
 
       - name: Build web app and sync into Android project
+        working-directory: ${{ env.APP_DIR }}
         run: pnpm sync
 
       - name: Build APK
-        working-directory: android
+        working-directory: ${{ env.APP_DIR }}/android
         run: |
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
       - name: Name the APK
-        run: cp android/app/build/outputs/apk/debug/app-debug.apk PersExp.apk
+        run: cp "$APP_DIR/android/app/build/outputs/apk/debug/app-debug.apk" PersExp.apk
 
       - uses: actions/upload-artifact@v4
         with:

@@ -12,8 +12,6 @@ jobs:
   apk:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
       - name: Locate project folder
         run: |
           F=$(find . -name capacitor.config.ts -not -path '*/node_modules/*' | head -1)

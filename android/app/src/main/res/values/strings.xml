@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PersExp</string>
+    <string name="title_activity_main">PersExp</string>
+    <string name="package_name">com.happy79.persexp</string>
+    <string name="custom_url_scheme">com.happy79.persexp</string>
+</resources>
